@@ -75,6 +75,8 @@
 
 - Đọc kĩ hướng dẫn bao gồm nhập OTP là `111111`, nạp tiền...
 
+
+
   
 
   
@@ -104,11 +106,8 @@
 - Nội dung file `build.gradle` :
 
 ```
-
 configurations.maybeCreate("default")
-
 artifacts.add("default", file('zpdk-release-v3.1.aar'))
-
 ```
 
 - Truy cập file `/android/settings.gradle` và thêm `include ':zpdk-release-v3.1'` vào dưới `include ':app'`
@@ -116,22 +115,17 @@ artifacts.add("default", file('zpdk-release-v3.1.aar'))
 - Truy cập file `/android/app/build.gradle` thêm vào `implementation project(path: ':zpdk-release-v3.1')` trong dependencies :
 
 ```
-
 dependencies {
-
-implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-
-implementation project(path: ':zpdk-release-v3.1')
-
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation project(path: ':zpdk-release-v3.1')
 }
-
 ```
 
 - Thực hiện resync, reload project,...
 
 - Truy cập `/android/src/main/koltin/.../MainActivity.kt`
 - Import các package cần thiết:
-```
+```Kotlin
 import  android.app.AlertDialog
 import  android.content.Intent
 import  android.os.Bundle
@@ -148,21 +142,20 @@ import  vn.zalopay.sdk.ZaloPaySDK
 import  vn.zalopay.sdk.listeners.PayOrderListener
 ```
 - Khởi tạo SDK ZaloPay và nhận callback từ nó
-```
+```Kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
-	super.onCreate(savedInstanceState)
-	ZaloPaySDK.init(2554, Environment.SANDBOX); // Merchant AppID
+     super.onCreate(savedInstanceState)
+     ZaloPaySDK.init(2554, Environment.SANDBOX); // Merchant AppID
 }
 
 override fun onNewIntent(intent: Intent) {
-	super.onNewIntent(intent)
-	Log.d("newIntent", intent.toString())
-	ZaloPaySDK.getInstance().onResult(intent)
+     super.onNewIntent(intent)
+     Log.d("newIntent", intent.toString())
+     ZaloPaySDK.getInstance().onResult(intent)
 }
 ```
 - Hàm mở ZaloPay và nhận kết quả 
-```
-
+```Kotlin
 override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         val channelPayOrder = "flutter.native/channelPayOrder"
@@ -198,12 +191,11 @@ override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
 ```
 
 
-
-
+- Quay về code ở màn hình bằng Flutter
 
 - Tạo một `MethodChannel` ở màn hình chuẩn bị thanh toán
 
-```
+```Dart
 
 static const MethodChannel platform = MethodChannel('flutter.native/channelPayOrder');
 
@@ -213,28 +205,16 @@ static const MethodChannel platform = MethodChannel('flutter.native/channelPayOr
 
 - Sử dụng `zp_trans_token` với `MethodChannel`
 
-```
-
+```Dart
 String response = "";
 
-  
-
 try {
-
-final String result = await platform.invokeMethod('payOrder', {"zptoken": zpToken});
-
-response = result;
-
-debugPrint("payOrder Result: '$result'.");
-
+    final String result = await platform.invokeMethod('payOrder', {"zptoken": zpToken});
+    response = result;
+    debugPrint("payOrder Result: '$result'.");
 } on PlatformException catch (e) {
-
-debugPrint("Failed to Invoke: '${e.message}'.");
-
-response = "Thanh toán thất bại";
-
+    debugPrint("Failed to Invoke: '${e.message}'.");
+    response = "Thanh toán thất bại";
 }
-
 debugPrint(response);
-
 ```
