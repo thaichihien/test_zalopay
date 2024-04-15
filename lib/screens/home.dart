@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 
 import '../utils/theme.dart';
 
@@ -26,6 +27,7 @@ class _HomeState extends State<Home> {
   String payResult = "";
   String orderId = "10000";
   bool showResult = false;
+  var logger = Logger();
 
   @override
   void initState() {
@@ -94,13 +96,20 @@ class _HomeState extends State<Home> {
         child: GestureDetector(
           onTap: () async {
             String response = "";
+
+            logger.i("Start...");
+
             try {
               final String result =
                   await platform.invokeMethod('payOrder', {"zptoken": zpToken});
+
+              logger.i(result);
+              
               response = result;
               debugPrint("payOrder Result: '$result'.");
             } on PlatformException catch (e) {
               debugPrint("Failed to Invoke: '${e.message}'.");
+              logger.i(e.message);
               response = "Thanh toán thất bại";
             }
             debugPrint(response);
@@ -138,7 +147,7 @@ class _HomeState extends State<Home> {
               orderId = value;
             });
           },
-          keyboardType: TextInputType.number,
+          keyboardType: TextInputType.text,
         ),
         _btnCreateOrder(orderId),
         Padding(

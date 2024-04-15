@@ -75,7 +75,7 @@
 
 - Đọc kĩ hướng dẫn bao gồm nhập OTP là `111111`, nạp tiền...
 
-
+- Để sử dụng ví, liên kết một tài khoản ngân hàng bất kì với OTP là : 111111
 
   
 
@@ -190,6 +190,17 @@ override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
     }
 ```
 
+- Bổ sung ở file `/android/app/src/main/AndroidManifest.xml` thêm intent cho ZaloPay trong thẻ `<activity></activity>`
+
+```xml
+<intent-filter>
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data android:scheme="demozpdk"
+        android:host="app" />
+</intent-filter>
+```
 
 - Quay về code ở màn hình bằng Flutter
 
