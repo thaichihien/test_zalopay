@@ -70,6 +70,9 @@ class _HomeState extends State<Home> {
                   );
                 });
 
+
+            // TODO gọi api mua sản phẩm ở đây là nhận về zp_trans_token
+
             Navigator.pop(context);
             zpTransToken = value;
             setState(() {
