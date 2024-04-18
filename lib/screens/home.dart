@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 
 import '../utils/theme.dart';
+import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   final String title;
@@ -70,15 +73,51 @@ class _HomeState extends State<Home> {
                   );
                 });
 
+            
+
+            final body = jsonEncode(<String, dynamic>{
+              "payment_method": "ZaloPay",
+              "ticket_type_id": 6,
+              "weekday": "Tue",
+              "adult_quantity": 1
+            });
+
+            logger.i(body);
 
             // TODO gọi api mua sản phẩm ở đây là nhận về zp_trans_token
+            final response = await http.post(
+                Uri.parse(
+                    '<your host>/amusement-park-ticket/purchase'),
+                headers: <String, String>{
+                  'Content-Type': 'application/json; charset=UTF-8',
+                  'Authorization':
+                      'Bearer <access token>'
+                },
+                body: body);
 
-            Navigator.pop(context);
-            zpTransToken = value;
-            setState(() {
-              zpTransToken = value;
-              showResult = true;
-            });
+            logger.i(response.statusCode);
+            logger.i(response.body);
+
+            if (response.statusCode > 200 && response.statusCode < 300) {
+              final Map<String, dynamic> data = jsonDecode(response.body);
+              logger.i(data);
+              // ignore: use_build_context_synchronously
+              Navigator.pop(context);
+              zpTransToken = data["third_party_transaction_id"];
+              setState(() {
+                zpTransToken = data["third_party_transaction_id"];
+                orderId = data['third_party_order_id'];
+                showResult = true;
+              });
+
+              
+              // Navigator.pop(context);
+              // zpTransToken = value;
+              // setState(() {
+              //   zpTransToken = value;
+              //   showResult = true;
+              // });
+            }
           },
           child: Container(
               height: 50.0,
@@ -107,8 +146,22 @@ class _HomeState extends State<Home> {
                   await platform.invokeMethod('payOrder', {"zptoken": zpToken});
 
               logger.i(result);
-              
+
               response = result;
+
+              final res = await http.get(
+                Uri.parse(
+                    '<your host>/payment/confirm/zalopay/$orderId'),
+              );
+
+              logger.i(res.statusCode);
+              logger.i(res.body);
+
+              if (res.statusCode == 200) {
+                final Map<String, dynamic> data = jsonDecode(res.body);
+                logger.i(data);
+              }
+
               debugPrint("payOrder Result: '$result'.");
             } on PlatformException catch (e) {
               debugPrint("Failed to Invoke: '${e.message}'.");
@@ -167,6 +220,23 @@ class _HomeState extends State<Home> {
           padding: const EdgeInsets.symmetric(vertical: 5.0),
           child: Text(
             zpTransToken,
+            style: valueStyle,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5.0),
+          child: Visibility(
+            visible: showResult,
+            child: Text(
+              "order id:",
+              style: textStyle,
+            ),
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 5.0),
+          child: Text(
+            orderId,
             style: valueStyle,
           ),
         ),

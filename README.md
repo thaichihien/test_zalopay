@@ -13,7 +13,7 @@
 
   
 
-## Miêu tả luồng
+## Miêu tả luồng ZaloPay
 
   
 
@@ -48,8 +48,16 @@
 ![zalopay app-app flow](https://docs.zalopay.vn/images/v2/apptoapp-payment-v2.png)
 
   
+## Hướng dẫn bước thực hiện của  E-ticket
 
-  
+-   **Ứng dụng Flutter** gọi api  mua vé đến **Server**
+-   **Ứng dụng Flutter**  nhận về thông tin đơn hàng, `third_party_transaction_id`  tương ứng `zp_trans_token` , `third_party_order_id` là id của đơn hàng ZaloPay
+- **Ứng dụng Flutter** sử dụng `zp_trans_token`  (`third_party_transaction_id` từ server) để thực hiện mở app **ZaloPay** 
+
+- Tại app **ZaloPay**, khách hàng tiến hành thực hiện thanh toán
+
+- Sau khi hoàn thành thành, **Ứng dụng Flutter** nhận kết quả từ app **ZaloPay** và đồng thời gọi api kiểm tra đơn hàng của **Server** với `third_party_order_id`
+
 
 ## Hướng dẫn chuẩn bị Sandbox
 
@@ -77,7 +85,7 @@
 
 - Để sử dụng ví, liên kết một tài khoản ngân hàng bất kì với OTP là : 111111
 
-  
+
 
   
 
